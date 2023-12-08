@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.sunnyweather.R
 import com.example.sunnyweather.databinding.ActivityWeatherBinding
 import com.sunnyweather.android.logic.model.Weather
+import com.sunnyweather.android.logic.model.getSky
 import com.sunnyweather.android.util.ToastUtil
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -25,6 +26,7 @@ class WeatherActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_weather)
+        setContentView(R.layout.activity_weather)
         if (viewMode.locationLng.isEmpty()) {
             viewMode.locationLat = intent.getStringExtra("location_lng") ?: ""
         }
@@ -61,10 +63,10 @@ class WeatherActivity : AppCompatActivity() {
         val daily = weather.daily
         val currentTempText = "${realTime.temperature.toInt()} ℃"
         dataBinding.nowLayout.currentTemp.text = currentTempText
-        //dataBinding.nowLayout.currentSky.text = getSky(realtime.skycon).info
+        dataBinding.nowLayout.currentSky.text = getSky(realTime.skycon).info
         val currentPM25Text = "空气指数 ${realTime.airQuality.chn.toInt()}"
         dataBinding.nowLayout.currentAQI.text = currentPM25Text
-        //dataBinding.nowLayout.nowLayout.setBackgroundResource(getSky(realtime.skycon).bg)
+        dataBinding.nowLayout.nowLayout.setBackgroundResource(getSky(realTime.skycon).bg)
         dataBinding.forecastLayout.forecastLayout.removeAllViews()
         val days = daily.skycon.size
         for (i in 0 until days) {
@@ -77,9 +79,9 @@ class WeatherActivity : AppCompatActivity() {
             val skyInfo = view.findViewById(R.id.skyInfo) as TextView
             val temperatureInfo = view.findViewById(R.id.temperatureInfo) as TextView
             dateInfo.text = simpleDateFormat.format(skycon.date)
-            //val sky = getSky(skycon.value)
-            //skyIcon.setImageResource(sky.icon)
-            //skyInfo.text = sky.info
+            val sky = getSky(skycon.value)
+            skyIcon.setImageResource(sky.icon)
+            skyInfo.text = sky.info
             val tempText = "${temperature.min.toInt()} ~ ${temperature.max.toInt()} ℃"
             temperatureInfo.text = tempText
             dataBinding.forecastLayout.forecastLayout.addView(view)
