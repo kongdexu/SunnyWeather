@@ -5,4 +5,4 @@ package com.sunnyweather.android.logic.model
  *
  * @since 2023/12/8
  */
-data class Weather(val realTime: RealtimeResponse.RealTime, val daily: DailyResponse.Daily)
+data class Weather(val realTime: RealtimeResponseBody.Realtime, val daily: DailyResponse.Daily)

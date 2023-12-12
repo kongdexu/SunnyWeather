@@ -1,6 +1,7 @@
 package com.sunnyweather.android.logic
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.liveData
 import com.sunnyweather.android.logic.model.Weather
 import com.sunnyweather.android.logic.network.SunnyWeatherNetwork
@@ -17,6 +18,8 @@ import kotlin.coroutines.CoroutineContext
  */
 object Repository {
 
+    private val TAG = "Repository"
+
     fun searchPlaces(query: String) = fire(Dispatchers.IO) {
         val placeResponse = SunnyWeatherNetwork.searchPlaces(query)
         if (placeResponse.status == "ok") {
@@ -28,6 +31,7 @@ object Repository {
     }
 
     fun refreshWeather(lng: String, lat: String) = fire(Dispatchers.IO) {
+        Log.i(TAG, "refreshWeather")
         coroutineScope {
             val deferredRealTime = async {
                 SunnyWeatherNetwork.getRealTimeWeather(lng, lat)
@@ -37,26 +41,14 @@ object Repository {
             }
             val realtimeResponse = deferredRealTime.await()
             val dailyResponse = deferredDaily.await()
-            if (realtimeResponse.status == "ok" && dailyResponse.status == "ok") {
-                val weather = Weather(realtimeResponse.result.realTime, dailyResponse.result.daily)
+            if (realtimeResponse.status == "ok") {
+                val weather = Weather(realtimeResponse.result.realtime, dailyResponse.result.daily)
                 Result.success(weather)
             } else {
-                Result.failure(RuntimeException("realtimeResponse status = ${realtimeResponse.status}  +  dailyResponse status = ${dailyResponse.status}"))
+                Result.failure(RuntimeException("realtimeResponse status = ${realtimeResponse.status}"))
             }
         }
     }
-
-//    private fun <T> fire(context: CoroutineContext, block: suspend () -> Result<T>) =
-//        liveData(context) {
-//            val result = try {
-//                block
-//            } catch (exception: Exception) {
-//                Result.failure<T>(exception)
-//            }
-//            emit(result)
-//        }
-
-
     private fun <T> fire(context: CoroutineContext, block: suspend () -> Result<T>) =
         liveData(context) {
             val result = try {

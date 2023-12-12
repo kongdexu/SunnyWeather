@@ -13,6 +13,7 @@
         android:scrollbars="none"
         android:overScrollMode="never"
         android:visibility="invisible"
+        android:background="@drawable/bg_clear_day"
         tools:context="com.sunnyweather.android.ui.weather.WeatherActivity">
 
         <LinearLayout
