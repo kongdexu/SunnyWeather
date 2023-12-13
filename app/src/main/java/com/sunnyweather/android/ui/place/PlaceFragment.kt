@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sunnyweather.R
 import com.example.sunnyweather.databinding.FragmentPlaceBinding
+import com.sunnyweather.android.logic.model.Place
+import com.sunnyweather.android.ui.weather.WeatherFragment
 import com.sunnyweather.android.util.ToastUtil
 
 /**
@@ -23,7 +25,7 @@ class PlaceFragment: Fragment() {
 
     private val TAG = "PlaceFragment"
 
-    private val viewModel by lazy { ViewModelProvider(this)[PlaceViewModel::class.java] }
+    val viewModel by lazy { ViewModelProvider(this)[PlaceViewModel::class.java] }
 
     private lateinit var placeAdapter: PlaceAdapter
 
@@ -42,6 +44,10 @@ class PlaceFragment: Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        if (viewModel.isSavePlace()) {
+            val place = viewModel.getSavePlace();
+            pushWeatherFragment(place)
+        }
         val layoutManager = LinearLayoutManager(activity)
         dataBinding.recyclerView.layoutManager = layoutManager
         placeAdapter = PlaceAdapter(this, viewModel.placeList)
@@ -69,6 +75,20 @@ class PlaceFragment: Fragment() {
                 it.exceptionOrNull()?.printStackTrace()
             }
         }
+    }
+
+    fun pushWeatherFragment(place: Place) {
+        val weatherFragment = WeatherFragment()
+        val bundle = Bundle().apply {
+            putString("location_lng", place.location.lng)
+            putString("location_lat", place.location.lat)
+            putString("place_name", place.name)
+        }
+        weatherFragment.arguments = bundle
+        activity?.supportFragmentManager?.beginTransaction()
+            ?.replace(R.id.place_fragment, weatherFragment)
+            ?.addToBackStack(null)
+            ?.commit()
     }
 
 }

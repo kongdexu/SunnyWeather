@@ -21,7 +21,7 @@ data class RealtimeResponseBody(
 
     data class Local(var status: String, var datasource: String, var intensity: Int)
 
-    data class Nearest(var status: String, var distance: Int, var intensity: Int)
+    data class Nearest(var status: String, var distance: Float, var intensity: Double)
 
     data class Precipitation(var local: Local, var nearest: Nearest)
 
@@ -48,7 +48,7 @@ data class RealtimeResponseBody(
 
     data class Realtime(
         var status: String,
-        var temperature: Int,
+        var temperature: Float,
         var humidity: Float,
         var cloudrate: Float,
         var skycon: String,
