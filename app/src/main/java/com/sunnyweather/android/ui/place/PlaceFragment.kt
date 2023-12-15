@@ -7,12 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sunnyweather.R
 import com.example.sunnyweather.databinding.FragmentPlaceBinding
+import com.sunnyweather.android.logic.Repository
 import com.sunnyweather.android.logic.model.Place
+import com.sunnyweather.android.ui.base.BaseFragment
 import com.sunnyweather.android.ui.weather.WeatherFragment
 import com.sunnyweather.android.util.ToastUtil
 
@@ -21,7 +22,7 @@ import com.sunnyweather.android.util.ToastUtil
  *
  * @since 2023/12/8
  */
-class PlaceFragment: Fragment() {
+class PlaceFragment: BaseFragment() {
 
     private val TAG = "PlaceFragment"
 
@@ -31,22 +32,27 @@ class PlaceFragment: Fragment() {
 
     private lateinit var dataBinding: FragmentPlaceBinding
 
+    private var isRefresh = true;
+
+    fun setIsRefresh(b: Boolean) {
+        this.isRefresh = b
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        dataBinding =
-            DataBindingUtil.inflate(layoutInflater, R.layout.fragment_place, container, false)
+        dataBinding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_place, container, false)
         dataBinding.viewModel = viewModel
         return dataBinding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (viewModel.isSavePlace()) {
-            val place = viewModel.getSavePlace();
+        if (Repository.isSavePlace() && isRefresh) {
+            val place = Repository.getSavePlace()
             pushWeatherFragment(place)
+            return
         }
         val layoutManager = LinearLayoutManager(activity)
         dataBinding.recyclerView.layoutManager = layoutManager
@@ -78,17 +84,20 @@ class PlaceFragment: Fragment() {
     }
 
     fun pushWeatherFragment(place: Place) {
-        val weatherFragment = WeatherFragment()
+        Log.i(TAG, "pushWeatherFragment place: $place")
+        //var weatherFragment = findFragmentByTag(WeatherFragment::class.java.name)
+        var weatherFragment: WeatherFragment? = null
+        if (weatherFragment == null) {
+            Log.i(TAG, "pushWeatherFragment weatherFragment == null")
+            weatherFragment = WeatherFragment()
+        }
         val bundle = Bundle().apply {
             putString("location_lng", place.location.lng)
             putString("location_lat", place.location.lat)
             putString("place_name", place.name)
         }
         weatherFragment.arguments = bundle
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.place_fragment, weatherFragment)
-            ?.addToBackStack(null)
-            ?.commit()
+        showFragment(weatherFragment)
     }
 
 }

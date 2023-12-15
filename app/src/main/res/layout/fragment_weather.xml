@@ -6,33 +6,40 @@
 
     </data>
 
-    <ScrollView
-        android:id="@+id/weather_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:visibility="invisible"
-        android:background="@drawable/bg_clear_day"
-        tools:context="com.sunnyweather.android.ui.weather.WeatherActivity">
-
-        <LinearLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <include
-                android:id="@+id/nowLayout"
-                layout="@layout/now" />
+            <ScrollView
+                android:id="@+id/weather_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_clear_day"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:visibility="visible"
+                tools:context="com.sunnyweather.android.ui.weather.WeatherActivity">
 
-            <include
-                android:id="@+id/forecastLayout"
-                layout="@layout/forecast" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            <include
-                android:id="@+id/lifeIndexLayout"
-                layout="@layout/life_index" />
-        </LinearLayout>
+                    <include
+                        android:id="@+id/nowLayout"
+                        layout="@layout/now" />
 
-    </ScrollView>
+                    <include
+                        android:id="@+id/forecastLayout"
+                        layout="@layout/forecast" />
+
+                    <include
+                        android:id="@+id/lifeIndexLayout"
+                        layout="@layout/life_index" />
+                </LinearLayout>
+
+            </ScrollView>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>

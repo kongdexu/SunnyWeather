@@ -8,13 +8,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.sunnyweather.R
 import com.example.sunnyweather.databinding.FragmentWeatherBinding
 import com.sunnyweather.android.logic.model.Weather
 import com.sunnyweather.android.logic.model.getSky
+import com.sunnyweather.android.ui.base.BaseFragment
+import com.sunnyweather.android.ui.place.PlaceFragment
 import com.sunnyweather.android.util.ToastUtil
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -24,7 +25,7 @@ import java.util.Locale
  *
  * @since 2023/12/12
  */
-class WeatherFragment: Fragment() {
+class WeatherFragment: BaseFragment() {
 
     private val TAG = "WeatherFragment"
 
@@ -60,8 +61,17 @@ class WeatherFragment: Fragment() {
                 ToastUtil.showToast("无法获取天气信息")
                 result.exceptionOrNull()?.printStackTrace()
             }
+            dataBinding.swipeRefresh.isRefreshing = false
         })
+        dataBinding.swipeRefresh.setOnRefreshListener { refreshWeather() }
+        dataBinding.nowLayout.imageSwitch.setOnClickListener { pushPlaceFragment() }
+        refreshWeather()
+    }
+
+    private fun refreshWeather() {
+        Log.i(TAG, "refreshWeather lat = ${viewMode.locationLat} ---- lon = ${viewMode.locationLng}")
         viewMode.refreshWeather(viewMode.locationLng, viewMode.locationLat)
+        dataBinding.swipeRefresh.isRefreshing = true
     }
 
     private fun showWeatherInfo(weather: Weather) {
@@ -102,4 +112,89 @@ class WeatherFragment: Fragment() {
         dataBinding.lifeIndexLayout.carWashingText.text = lifeIndex.carWashing[0].desc
         dataBinding.weatherLayout.visibility = View.VISIBLE
     }
+
+    private fun pushPlaceFragment() {
+        //var placeFragment = findFragmentByTag(PlaceFragment::class.java.name) as? PlaceFragment
+        var placeFragment: PlaceFragment? = null
+        if (placeFragment == null) {
+            Log.i(TAG, "pushPlaceFragment placeFragment == null")
+            placeFragment = PlaceFragment()
+        }
+        placeFragment.setIsRefresh(false)
+        showFragment(placeFragment)
+    }
+/*
+    private lateinit var locationManager: LocationManager
+    private fun getLocation() {
+        Log.i(TAG, "getLocation SDK_INT = ${Build.VERSION.SDK_INT}")
+        locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // 判断当前是否拥有使用GPS的权限
+        if (ActivityCompat.checkSelfPermission(
+                SunnyWeatherApplication.context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                SunnyWeatherApplication.context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // 申请权限
+            activity?.let {
+                ActivityCompat.requestPermissions(
+                    it,
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ),
+                    100
+                )
+            }
+            return
+        }
+        // 启动位置请求
+        // LocationManager.GPS_PROVIDER GPS定位
+        // LocationManager.NETWORK_PROVIDER 网络定位
+        // LocationManager.PASSIVE_PROVIDER 被动接受定位信息
+        val provider = locationManager.getProviders(true)
+        if (provider.contains(LocationManager.GPS_PROVIDER)) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
+        } else if (provider.contains(LocationManager.NETWORK_PROVIDER)) {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, this)
+        } else if (provider.contains(LocationManager.PASSIVE_PROVIDER)) {
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0f, this)
+        } else {
+            ToastUtil.showToast("定位服务不可用")
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.i(TAG, "onRequestPermissionsResult requestCode = $requestCode")
+        Log.i(TAG, "onRequestPermissionsResult permissions = $permissions")
+        Log.i(TAG, "onRequestPermissionsResult grantResults = $grantResults")
+        if (requestCode == 100 && grantResults.isNotEmpty()) {
+            var permission = true
+            for (i in grantResults) {
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    permission = false
+                }
+            }
+            if (permission) {
+                getLocation()
+            }
+        }
+    }
+
+    override fun onLocationChanged(location: Location) {
+        viewMode.locationLat = location.latitude.toString()
+        viewMode.locationLng = location.longitude.toString()
+        // 移除位置管理器
+        // 需要一直获取位置信息可以去掉这个
+        locationManager.removeUpdates(this)
+        refreshWeather()
+    }*/
 }

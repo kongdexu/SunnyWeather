@@ -19,7 +19,7 @@ data class RealtimeResponseBody(
 ) {
     data class Wind(var speed: Float, var direction: Int)
 
-    data class Local(var status: String, var datasource: String, var intensity: Int)
+    data class Local(var status: String, var datasource: String, var intensity: Double)
 
     data class Nearest(var status: String, var distance: Float, var intensity: Double)
 

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <fragment
+    <data>
+
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/place_fragment"
-        android:name="com.sunnyweather.android.ui.place.PlaceFragment"/>
-</FrameLayout>
+        android:fitsSystemWindows="true">
+
+        <fragment
+            android:id="@+id/weather_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.sunnyweather.android.ui.place.PlaceFragment"/>
+    </FrameLayout>
+</layout>
